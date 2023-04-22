@@ -30,7 +30,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         test_str = sys.argv[1]
         if check_date(test_str) == False:
-            print(f"Ошибочный формат даты - {test_str}.")
+            print(f"Ошибочная дата - {test_str}.")
         else:
             print(f"Дата {test_str} корректна.")
     else:
