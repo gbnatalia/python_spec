@@ -1,100 +1,57 @@
 '''
-Напишите следующие функции:
-- Нахождение корней квадратного уравнения
-- Генерация csv файла с тремя случайными числами в каждой строке.
-100-1000 строк.
-- Декоратор, запускающий функцию нахождения корней квадратного
-уравнения с каждой тройкой чисел из csv файла.
-- Декоратор, сохраняющий переданные параметры и результаты работы
-функции в json файл.
+1. Создайте класс-фабрику.
+- Класс принимает тип животного (название одного из созданных классов)
+и параметры для этого типа.
+- Внутри класса создайте экземпляр на основе переданного типа и
+верните его из класса-фабрики.
 '''
-from typing import Callable
-from pathlib import Path
-import csv
-import random
-import json
-
-def generate_csv_file(filename):
-    '''
-    Генерация csv файла с тремя случайными числами в каждой строке.
-    100-1000 строк.
-    '''
-    with open(filename, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        cnt_string = random.randint(100, 1001)
-        for i in range(cnt_string):
-            row = [random.randint(1, 100) for _ in range(3)]
-            writer.writerow(row)
 
 
-def save_decoration(func: Callable):
-    '''
-    Декоратор, сохраняющий переданные параметры и результаты работы
-    функции в json файл.
-    '''
-    filename = Path(f"{func.__name__}.json")
-    if filename.exists():
-        with open(filename, 'r', encoding="utf-8") as f:
-            data = json.load(f)
-    else:
-        data = []
+class Mammal:
+    def __init__(self, type, age, paws):
+        self.type, self.age, self.paws = type, age, paws
 
-    def wrapper(*args):
-        result = func(*args)
-        with open(filename, 'w', encoding="utf-8") as file:
-            data.append({'args': args, 'solution': str(result) if result != None else "None"})
-            json.dump(data, file, indent=4)
-    return wrapper
+    def __str__(self):
+        return f"Зверь: {self.type}, возраст: {self.age} лет/год(а), лапы: {self.paws}"
 
 
-def solution_decoration(func: Callable): 
-    '''
-    Декоратор, запускающий функцию нахождения корней квадратного
-    уравнения с каждой тройкой чисел из csv файла.
-    '''
-    filename = 'random_numbers.csv'
-    generate_csv_file(filename)   
-    def wrapper():  
-        nonlocal filename  
-        with open(filename) as csvfile:
-            reader = csv.reader(csvfile)
-            for row in reader:
-                a, b, c = row                    
-                roots = func(a, b, c)
-        print("операция выполнена!")
-        return roots
-    return wrapper            
+class Fish:
+    def __init__(self, type, age, color):
+        self.type, self.age, self.color = type, age, color
+
+    def __str__(self):
+        return f"Рыба: {self.type}, возраст: {self.age} лет/год(а), цвет: {self.color}"
 
 
-@solution_decoration
-@save_decoration
-def find_solution(*args):
-    '''
-    Нахождение корней квадратного уравнения
-    ax^2 + bx + c = 0
-    '''  
-    if len(args) < 3:
-        return None
-    
-    a, b, c = args
-    a = int(a)
-    b = int(b)
-    c = int(c)
+class Bird:
+    def __init__(self, type, age, feathers):
+        self.type, self.age, self.feathers = type, age, feathers
 
-    if a == 0 and b == 0 and c == 0:
-        return '00'
-    
-    discriminant = b**2 - 4*a*c
-    if discriminant < 0:
-        return None
-    elif discriminant == 0:
-        return (-b / (2*a),)
-    else:
-        return ((-b + discriminant**0.5) / (2*a), (-b - discriminant**0.5) / (2*a))
+    def __str__(self):
+        return f"Птица: {self.type}, возраст: {self.age} лет/год(а, крылья: {self.feathers}"
 
-		
+
+class FabricaClass:
+    __class_dict = {}
+
+    def register_class(self, class_name, class_h):
+        self.__class_dict[class_name] = class_h
+        return self
+
+    def get_instance(self, type_class, *args, **kwargs):
+        return self.__class_dict[type_class](*args, **kwargs)
+
+
 if __name__ == "__main__":
-    find_solution()
+    fabr = FabricaClass()
+    fabr.register_class("Mammal", Mammal).register_class("Fish", Fish).register_class("Bird", Bird)
+    my_mammal = fabr.get_instance("Mammal", "Кошка", 5, "рыжая")
+    my_fish = fabr.get_instance("Fish", "Гуппи", 22, "Красно-белая")
+    my_bird = fabr.get_instance("Bird", "Ворона", 2, "Черная")
+    print(my_mammal)
+    print(my_fish)
+    print(my_bird)
 
-       
-
+    fabr2 = FabricaClass()
+    my_mammal2 = fabr2.get_instance("Mammal", "Собака", 15, "Черно-белая")
+    print(my_mammal2)
