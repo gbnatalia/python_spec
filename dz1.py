@@ -39,7 +39,11 @@ class FabricaClass:
         return self
 
     def get_instance(self, type_class, *args, **kwargs):
-        return self.__class_dict[type_class](*args, **kwargs)
+        if type_class in self.__class_dict.keys():
+            return self.__class_dict[type_class](*args, **kwargs)
+        else:
+            print(f"Класс {type_class} не зарегистрирован!")
+            return None
 
 
 if __name__ == "__main__":
@@ -55,3 +59,8 @@ if __name__ == "__main__":
     fabr2 = FabricaClass()
     my_mammal2 = fabr2.get_instance("Mammal", "Собака", 15, "Черно-белая")
     print(my_mammal2)
+
+    fabr3 = FabricaClass()
+    my_mammal3 = fabr2.get_instance("MMM", "Собака", 15, "Черно-белая")
+    print(my_mammal3)
+
